@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Swiss Craft – Live-Übersicht (Minecraft‑Projekt)</title>
+  <style>
+    :root{
+      --bg: #0b0b10; --card:#12121a; --muted:#a2a6b3; --text:#f3f4f6; --accent:#8b5cf6; --accent-2:#22c55e; --warn:#f59e0b; --danger:#ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b0b10,#0e0e14);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+    .container{max-width:1200px;margin:40px auto;padding:0 16px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:16px}
+    h1{font-size: clamp(22px, 3vw, 34px);margin:0}
+    .controls{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{background:#1a1a25;border:1px solid #24243a;color:var(--text);padding:10px 14px;border-radius:999px}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:13px;border:1px solid #2a2a40;background:#151522}
+    .badge.live{border-color:rgba(139,92,246,.35);background:rgba(139,92,246,.12)}
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.live{background:var(--accent)}
+    .dot.off{background:#475569}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:18px}
+    .card{background:var(--card);border:1px solid #1f2430;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .thumb{position:relative;aspect-ratio:16/9;background:#0f0f15}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .liveTag{position:absolute;top:10px;left:10px;background:var(--danger);color:#fff;font-size:12px;font-weight:700;padding:5px 8px;border-radius:999px}
+    .body{padding:14px 14px 16px}
+    .title{font-size:16px;font-weight:700;margin:0 0 6px}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+    .meta .chip{font-size:12px;border:1px solid #2a2a40;background:#161624;padding:4px 8px;border-radius:999px;color:var(--muted)}
+    .actions{display:flex;gap:10px;margin-top:12px}
+    .btn{appearance:none;border:1px solid #2a2a40;background:#141423;color:var(--text);padding:9px 12px;border-radius:12px;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+    .btn:hover{border-color:#3a3a55;transform:translateY(-1px)}
+    .section{margin-top:32px}
+    details{background:#101019;border:1px solid #1f2430;border-radius:14px;padding:12px}
+    details summary{cursor:pointer;color:var(--muted)}
+    footer{opacity:.65;margin:40px 0 24px;font-size:13px}
+    .sr-only{position:absolute;left:-9999px}
+    .empty{border:1px dashed #2a2a40;border-radius:14px;padding:24px;color:var(--muted);text-align:center}
+    .row{display:flex;gap:8px;align-items:center}
+    .ok{color:var(--accent-2)}
+    .fail{color:var(--danger)}
+    .warn{color:var(--warn)}
+    .banner{border:1px solid #3a2a10;background:#211806;color:#f8e6c0;border-radius:12px;padding:12px;display:none;margin:12px 0}
+    .banner.error{border-color:#3a1010;background:#210d0d;color:#ffd2d2}
+    .cfg{display:grid;grid-template-columns: 1fr 1fr; gap:8px; margin-top:12px}
+    .cfg input{width:100%;padding:10px;border-radius:10px;border:1px solid #2a2a40;background:#0f0f17;color:var(--text)}
+    .cfg .row{gap:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Swiss Craft – Live‑Übersicht <span style="opacity:.6;font-weight:500">(Minecraft‑Projekt)</span></h1>
+      <div class="controls">
+        <span class="badge"><span class="dot off"></span> Offline</span>
+        <span class="badge live"><span class="dot live"></span> Live</span>
+        <span class="pill" id="last-updated">Aktualisiert: –</span>
+        <button class="btn" id="refresh">Neu laden</button>
+      </div>
+    </header>
+    <p style="margin:0 0 12px;color:var(--muted)">Teilnehmerliste des Swiss‑Craft‑Projekts. Live‑Streams werden automatisch erkannt und <strong>oben</strong> angezeigt.</p>
+
+    <div id="banner" class="banner"></div>
+
+    <details open>
+      <summary>API‑Setup (Client‑Credentials) & Hinweise</summary>
+      <div class="cfg">
+        <label>Client ID
+          <input id="cfg-client-id" placeholder="Twitch CLIENT_ID" />
+        </label>
+        <label>Access Token
+          <input id="cfg-access-token" placeholder="App Access Token (falls vorhanden)" />
+        </label>
+        <label>Client Secret (nur für Token‑Abruf – nicht für Produktion)
+          <input id="cfg-client-secret" placeholder="Twitch CLIENT_SECRET" />
+        </label>
+        <label>Token‑Endpoint (Server) – empfohlen
+          <input id="cfg-token-endpoint" placeholder="z. B. /api/twitch-token" />
+        </label>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btn-save">Speichern</button>
+        <button class="btn" id="btn-validate">Token prüfen</button>
+        <button class="btn" id="btn-fetch-token">Token holen (Client Credentials)</button>
+        <button class="btn" id="btn-mock">Mock‑Daten verwenden</button>
+        <button class="btn" id="btn-clear">Zugangsdaten löschen</button>
+      </div>
+      <p class="warn" style="margin-top:8px">Hinweis: In <strong>Produktion</strong> bitte das Access Token <em>serverseitig</em> holen und hier nur eintragen. Client Secret gehört nicht ins Frontend.</p>
+    </details>
+
+    <!-- Live Section -->
+    <section class="section" aria-labelledby="live-heading">
+      <h2 id="live-heading">Gerade live</h2>
+      <div id="live-grid" class="grid"></div>
+      <div id="live-empty" class="empty" style="display:none">Derzeit ist niemand live.</div>
+    </section>
+
+    <!-- Offline Section (single instance) -->
+    <section class="section" aria-labelledby="offline-heading">
+      <h2 id="offline-heading">Offline</h2>
+      <details open>
+        <summary>Offline‑Kanäle anzeigen/ausblenden</summary>
+        <div id="offline-grid" class="grid" style="margin-top:12px"></div>
+      </details>
+    </section>
+
+    <!-- Other Platforms -->
+    <section class="section" aria-labelledby="other-heading">
+      <h2 id="other-heading">Andere Plattformen (kein Live‑Check möglich)</h2>
+      <div id="other-list" class="grid"></div>
+    </section>
+
+    <!-- Roster -->
+    <section class="section" aria-labelledby="roster-heading">
+      <h2 id="roster-heading">Teilnehmerliste</h2>
+      <div id="roster" class="grid"></div>
+    </section>
+
+    <footer>
+      <div>Automatische Aktualisierung alle 60 Sekunden. Datenquelle: Twitch Helix API.</div>
+      <div id="selftest" style="margin-top:8px"></div>
+    </footer>
+  </div>
+
+  <script>
+    // ========================
+    // 🔐 Konfiguration & State
+    // ========================
+    const LS_KEYS = {
+      clientId: 'swisscraft.twitch.client_id',
+      accessToken: 'swisscraft.twitch.access_token',
+      clientSecret: 'swisscraft.twitch.client_secret',
+      tokenEndpoint: 'swisscraft.twitch.token_endpoint'
+    };
+
+    // Defaults (können per UI überschrieben werden)
+    let CLIENT_ID   = localStorage.getItem(LS_KEYS.clientId)   || 'zxg5h7z2fm3cli0ywa7j84gk1xang7';
+    let ACCESS_TOKEN= localStorage.getItem(LS_KEYS.accessToken)|| '';
+    let CLIENT_SECRET = localStorage.getItem(LS_KEYS.clientSecret) || '4kk6ps3tnn14xpulnyefcru45r77dx';
+    let TOKEN_ENDPOINT = localStorage.getItem(LS_KEYS.tokenEndpoint) || '';
+
+    const USE_MOCK = { enabled: false };
+
+    // 🧾 Twitch‑Kanäle (nur Logins)
+    const TWITCH_CHANNELS = [
+      { name: 'MaeloRomani', login: 'maeloromani' },
+      { name: 'Elijah Tetilla', login: 'elijahtetillaa' },
+      { name: 'Deadinzoid', login: 'deadinzoid' },
+      { name: 'laisalicious', login: 'laisalicious' },
+      { name: 'Naxlani', login: 'naxlani' },
+      { name: 'SandroSchmitter', login: 'sandroschmitter' },
+      { name: 'JenniferJordii', login: 'jenniferjordii' },
+      { name: 'SamuSari', login: 'samusari' },
+      { name: 'Strike', login: 'strike' },
+      { name: 'prinznorin', login: 'prinznorin' },
+      { name: 'Samuel.zgg (Organisator)', login: 'samuel_zgg' },
+      { name: 'Nimmbaa', login: 'nimmbaa' },
+      { name: 'Monkeey99', login: 'monkeey99' },
+      { name: 'DreamyRere', login: 'dreamyrere' },
+      { name: 'Sir_Cooli', login: 'sir_cooli' },
+      { name: 'gery_live', login: 'gery_live' },
+      { name: 'Jakofski37', login: 'jakofski37' },
+      { name: 'KxEx', login: 'iamkxex' },
+      { name: 'its_Mauz1', login: 'its_mauz1' },
+      { name: 'TechnobirdxD', login: 'technobirdxd' }
+    ];
+
+    // 📺 Andere Plattformen (manuell)
+    const OTHER_LINKS = [
+      { name: 'ML Gamer (TikTok)', url: 'https://www.tiktok.com/@ml_gameryt', platform: 'TikTok' },
+      { name: 'Logik66 (TikTok)', url: 'https://www.tiktok.com/@logiksixtysix', platform: 'TikTok' },
+      { name: 'Sändu (TikTok)', url: 'https://www.tiktok.com/@saendu2k', platform: 'TikTok' }
+    ];
+
+    // =============
+    // 🔧 UI Helpers
+    // =============
+    const liveGrid = document.getElementById('live-grid');
+    const liveEmpty = document.getElementById('live-empty');
+    const offGrid = document.getElementById('offline-grid');
+    const otherList = document.getElementById('other-list');
+    const lastUpdated = document.getElementById('last-updated');
+    const banner = document.getElementById('banner');
+
+    function showBanner(msg, type='warn'){
+      banner.textContent = msg;
+      banner.className = 'banner ' + (type==='error'?'error':'');
+      banner.style.display = 'block';
+    }
+    function hideBanner(){ banner.style.display = 'none'; }
+
+    function fmtTime(date){
+      return new Intl.DateTimeFormat(undefined, { dateStyle:'short', timeStyle:'short' }).format(date);
+    }
+    function sinceText(iso){
+      const started = new Date(iso);
+      const mins = Math.max(0, Math.round((Date.now()-started.getTime())/60000));
+      if (mins < 1) return 'gerade eben';
+      if (mins < 60) return `seit ${mins} Min`;
+      const h = Math.floor(mins/60), m = mins%60;
+      return `seit ${h} Std ${m} Min`;
+    }
+
+    function channelCard(streamOrUser, isLive){
+      const url = `https://twitch.tv/${streamOrUser.login}`;
+      const title = isLive ? (streamOrUser.title || streamOrUser.display_name || streamOrUser.login) : (streamOrUser.display_name || streamOrUser.login);
+      const game = isLive ? (streamOrUser.game_name || '') : '';
+      const viewers = isLive ? (streamOrUser.viewer_count ?? null) : null;
+      const started = isLive ? (streamOrUser.started_at ? sinceText(streamOrUser.started_at) : '') : '';
+      const thumb = isLive && streamOrUser.thumbnail_url ? streamOrUser.thumbnail_url.replace('{width}', '640').replace('{height}','360') : null;
+
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      const thumbDiv = document.createElement('div');
+      thumbDiv.className = 'thumb';
+      if(thumb){
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.src = thumb + `?t=${Date.now()}`;
+        img.alt = `${streamOrUser.user_name || streamOrUser.display_name || streamOrUser.login} – Vorschau`;
+        thumbDiv.appendChild(img);
+        const tag = document.createElement('div');
+        tag.className = 'liveTag';
+        tag.textContent = 'LIVE';
+        thumbDiv.appendChild(tag);
+      }
+      card.appendChild(thumbDiv);
+
+      const body = document.createElement('div');
+      body.className = 'body';
+
+      const h3 = document.createElement('h3');
+      h3.className = 'title';
+      h3.textContent = title;
+      body.appendChild(h3);
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const a = document.createElement('a');
+      a.className = 'btn';
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = 'Zum Stream';
+      actions.appendChild(a);
+      body.appendChild(actions);
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      if(isLive && game){
+        const chipGame = document.createElement('span');
+        chipGame.className = 'chip';
+        chipGame.textContent = `Spiel: ${game}`;
+        meta.appendChild(chipGame);
+      }
+      if(isLive && viewers!=null){
+        const chipV = document.createElement('span');
+        chipV.className = 'chip';
+        chipV.textContent = `${viewers} Zuschauer`;
+        meta.appendChild(chipV);
+      }
+      if(isLive && started){
+        const chipS = document.createElement('span');
+        chipS.className = 'chip';
+        chipS.textContent = started;
+        meta.appendChild(chipS);
+      }
+
+      if(!isLive){
+        const chipOff = document.createElement('span');
+        chipOff.className = 'chip';
+        chipOff.textContent = 'offline';
+        meta.appendChild(chipOff);
+      }
+
+      body.appendChild(meta);
+      card.appendChild(body);
+      return card;
+    }
+
+    // ======================
+    // 🔌 Twitch API Wrapper
+    // ======================
+    function hasConfig(){
+      return !!CLIENT_ID && !CLIENT_ID.startsWith('REPLACE_');
+    }
+    function hasToken(){
+      return !!ACCESS_TOKEN && !ACCESS_TOKEN.startsWith('REPLACE_');
+    }
+
+    async function validateToken(){
+      if(USE_MOCK.enabled) return { valid:true, login:'mock' };
+      if(!hasToken()) throw new Error('CONFIG_MISSING: Kein Access Token gesetzt');
+      const res = await fetch('https://id.twitch.tv/oauth2/validate', {
+        headers: { 'Authorization': 'OAuth ' + ACCESS_TOKEN }
+      });
+      if(!res.ok) throw new Error('TOKEN_INVALID: '+res.status+' '+res.statusText);
+      return res.json();
+    }
+
+    async function fetchStreams(logins){
+      if(USE_MOCK.enabled) return mockStreams(logins);
+      if(!hasConfig() || !hasToken()) throw new Error('CONFIG_MISSING: fehlende Client ID oder Token');
+      const params = new URLSearchParams();
+      logins.forEach(l => params.append('user_login', l));
+      const res = await fetch('https://api.twitch.tv/helix/streams?' + params.toString(), {
+        headers: { 'Client-ID': CLIENT_ID, 'Authorization': 'Bearer ' + ACCESS_TOKEN }
+      });
+      if(!res.ok){
+        throw new Error('Twitch API Fehler: ' + res.status + ' ' + res.statusText);
+      }
+      const data = await res.json();
+      return data.data || [];
+    }
+
+    async function fetchUsers(logins){
+      if(USE_MOCK.enabled) return mockUsers(logins);
+      if(!hasConfig() || !hasToken()) throw new Error('CONFIG_MISSING: fehlende Client ID oder Token');
+      const params = new URLSearchParams();
+      logins.forEach(l => params.append('login', l));
+      const res = await fetch('https://api.twitch.tv/helix/users?' + params.toString(), {
+        headers: { 'Client-ID': CLIENT_ID, 'Authorization': 'Bearer ' + ACCESS_TOKEN }
+      });
+      if(!res.ok){
+        throw new Error('Twitch API Fehler (users): ' + res.status + ' ' + res.statusText);
+      }
+      const data = await res.json();
+      return data.data || [];
+    }
+
+    // =====================
+    // 🧪 Mock Daten (Fallback)
+    // =====================
+    function mockUsers(logins){
+      return logins.map(l => ({ id: 'u_'+l, login: l, display_name: l }));
+    }
+    function mockStreams(logins){
+      const picks = (arr,n)=> arr.slice(0).sort(()=>Math.random()-0.5).slice(0,n);
+      const chosen = new Set(picks(logins, 3));
+      const now = new Date().toISOString();
+      return logins.filter(l=>chosen.has(l)).map((l,i)=>({
+        id: 's_'+l,
+        user_login: l,
+        user_name: l,
+        title: 'Swiss Craft Live',
+        game_name: 'Minecraft',
+        viewer_count: 50 - i*7,
+        started_at: now,
+        thumbnail_url: 'https://static-cdn.jtvnw.net/previews-ttv/live_user_'+l+'-{width}x{height}.jpg'
+      }));
+    }
+
+    // =====================
+    // 🔁 Render Ablauf
+    // =====================
+    async function render(){
+      const allLogins = TWITCH_CHANNELS.map(c => c.login.toLowerCase());
+
+      if(!USE_MOCK.enabled){
+        try{
+          await validateToken();
+          hideBanner();
+        }catch(e){
+          const msg = String(e);
+          if(msg.includes('CONFIG_MISSING')){
+            showBanner('Kein gültiges Access Token gesetzt. Bitte Token eintragen (oder „Token holen“ nutzen) oder Mock‑Daten aktivieren.');
+          } else if(msg.includes('TOKEN_INVALID')){
+            showBanner('Token ungültig/abgelaufen. Bitte neues Access Token setzen (Button „Token holen“) oder Mock‑Daten aktivieren.', 'error');
+          } else {
+            showBanner('Token‑Prüfung fehlgeschlagen: '+e, 'error');
+          }
+          return;
+        }
+      }
+
+      let streams, users;
+      try{
+        streams = await fetchStreams(allLogins);
+        users = await fetchUsers(allLogins);
+      }catch(err){
+        const t = String(err);
+        if(t.includes('403')){
+          showBanner('Twitch API: 403 Forbidden. Prüfe bitte Client ID/Secret (ggf. neues Secret erzeugen) **oder** trage ein manuell erzeugtes Access Token ein.', 'error');
+        } else if(t.includes('401')){
+          showBanner('Twitch API: 401 Unauthorized. Token abgelaufen/ungültig. Bitte neues Token setzen oder Mock‑Daten aktivieren.', 'error');
+        } else {
+          showBanner('Daten konnten nicht geladen werden: '+err, 'error');
+        }
+        return;
+      }
+
+      const liveMap = new Map(streams.map(s => [ (s.user_login||s.user_name).toLowerCase(), s ]));
+      const userMap = new Map(users.map(u => [u.login.toLowerCase(), u]));
+
+      const live = [];
+      const off = [];
+      for (const c of TWITCH_CHANNELS){
+        const s = liveMap.get(c.login.toLowerCase());
+        if(s){
+          s.display_name = userMap.get(c.login.toLowerCase())?.display_name || c.name;
+          live.push(s);
+        } else {
+          const u = userMap.get(c.login.toLowerCase()) || { login: c.login, display_name: c.name };
+          off.push(u);
+        }
+      }
+
+      // Render
+      liveGrid.innerHTML = '';
+      offGrid.innerHTML = '';
+
+      if(live.length === 0){
+        liveEmpty.style.display = 'block';
+      } else {
+        liveEmpty.style.display = 'none';
+        live.sort((a,b)=> (b.viewer_count||0) - (a.viewer_count||0));
+        live.forEach(s => liveGrid.appendChild(channelCard(s, true)));
+      }
+
+      off.sort((a,b)=> (a.display_name||a.login).localeCompare(b.display_name||b.login));
+      off.forEach(u => offGrid.appendChild(channelCard(u, false)));
+
+      // Andere Plattformen
+      otherList.innerHTML = '';
+      OTHER_LINKS.forEach(it => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        const body = document.createElement('div');
+        body.className = 'body';
+        const h = document.createElement('h3'); h.className='title'; h.textContent = it.name; body.appendChild(h);
+        const actions = document.createElement('div'); actions.className='actions';
+        const a = document.createElement('a'); a.className='btn'; a.href=it.url; a.target='_blank'; a.rel='noopener'; a.textContent='Profil öffnen';
+        actions.appendChild(a); body.appendChild(actions);
+        const meta = document.createElement('div'); meta.className = 'meta';
+        const chip = document.createElement('span'); chip.className = 'chip'; chip.textContent = it.platform + ' – kein Live‑Check';
+        meta.appendChild(chip); body.appendChild(meta);
+        card.appendChild(body);
+        otherList.appendChild(card);
+      });
+
+      // Teilnehmerliste
+      const roster = document.getElementById('roster');
+      roster.innerHTML = '';
+      TWITCH_CHANNELS
+        .map(c => ({ name: c.name, url: `https://twitch.tv/${c.login}`, platform: 'Twitch' }))
+        .forEach(it => {
+          const card = document.createElement('article'); card.className='card';
+          const body = document.createElement('div'); body.className='body';
+          const h = document.createElement('h3'); h.className='title'; h.textContent = it.name; body.appendChild(h);
+          const actions = document.createElement('div'); actions.className='actions';
+          const a = document.createElement('a'); a.className='btn'; a.href=it.url; a.target='_blank'; a.rel='noopener'; a.textContent='Profil öffnen'; actions.appendChild(a); body.appendChild(actions);
+          const meta = document.createElement('div'); meta.className='meta';
+          const chip = document.createElement('span'); chip.className='chip'; chip.textContent = it.platform; meta.appendChild(chip);
+          body.appendChild(meta); card.appendChild(body); roster.appendChild(card);
+        });
+      OTHER_LINKS.forEach(it => {
+          const card = document.createElement('article'); card.className='card';
+          const body = document.createElement('div'); body.className='body';
+          const h = document.createElement('h3'); h.className='title'; h.textContent = it.name; body.appendChild(h);
+          const actions = document.createElement('div'); actions.className='actions';
+          const a = document.createElement('a'); a.className='btn'; a.href=it.url; a.target='_blank'; a.rel='noopener'; a.textContent='Profil öffnen'; actions.appendChild(a); body.appendChild(actions);
+          const meta = document.createElement('div'); meta.className='meta';
+          const chip = document.createElement('span'); chip.className='chip'; chip.textContent = it.platform; meta.appendChild(chip);
+          body.appendChild(meta); card.appendChild(body); roster.appendChild(card);
+        });
+
+      lastUpdated.textContent = 'Aktualisiert: ' + fmtTime(new Date());
+    }
+
+    // ==========================
+    // ▶️ Ablauf + Event Handler
+    // ==========================
+    async function run(){
+      try{ await render(); }
+      catch(err){ console.error(err); showBanner('Unbekannter Fehler: '+err, 'error'); }
+    }
+
+    document.getElementById('refresh').addEventListener('click', run);
+    setInterval(run, 60000);
+
+    // API‑Setup Handlers
+    const inId = document.getElementById('cfg-client-id');
+    const inTk = document.getElementById('cfg-access-token');
+    const inSe = document.getElementById('cfg-client-secret');
+    const inEp = document.getElementById('cfg-token-endpoint');
+    inId.value = CLIENT_ID.startsWith('REPLACE_') ? '' : CLIENT_ID;
+    inTk.value = ACCESS_TOKEN && !ACCESS_TOKEN.startsWith('REPLACE_') ? ACCESS_TOKEN : '';
+    inSe.value = CLIENT_SECRET || '';
+    inEp.value = TOKEN_ENDPOINT || '';
+
+    document.getElementById('btn-save').addEventListener('click', ()=>{
+      CLIENT_ID = inId.value.trim() || CLIENT_ID;
+      ACCESS_TOKEN = inTk.value.trim() || ACCESS_TOKEN;
+      CLIENT_SECRET = inSe.value.trim() || CLIENT_SECRET;
+      TOKEN_ENDPOINT = (inEp.value||'').trim() || TOKEN_ENDPOINT;
+      localStorage.setItem(LS_KEYS.clientId, CLIENT_ID);
+      if(ACCESS_TOKEN) localStorage.setItem(LS_KEYS.accessToken, ACCESS_TOKEN); else localStorage.removeItem(LS_KEYS.accessToken);
+      if(CLIENT_SECRET) localStorage.setItem(LS_KEYS.clientSecret, CLIENT_SECRET); else localStorage.removeItem(LS_KEYS.clientSecret);
+      if(TOKEN_ENDPOINT) localStorage.setItem(LS_KEYS.tokenEndpoint, TOKEN_ENDPOINT); else localStorage.removeItem(LS_KEYS.tokenEndpoint);
+      hideBanner();
+      run();
+    });
+
+    document.getElementById('btn-clear').addEventListener('click', ()=>{
+      localStorage.removeItem(LS_KEYS.clientId);
+      localStorage.removeItem(LS_KEYS.accessToken);
+      localStorage.removeItem(LS_KEYS.clientSecret);
+      localStorage.removeItem(LS_KEYS.tokenEndpoint);
+      CLIENT_ID = 'REPLACE_WITH_YOUR_TWITCH_CLIENT_ID';
+      ACCESS_TOKEN = 'REPLACE_WITH_YOUR_APP_ACCESS_TOKEN';
+      CLIENT_SECRET = '';
+      TOKEN_ENDPOINT = '';
+      inId.value = inTk.value = inSe.value = inEp.value = '';
+      showBanner('Zugangsdaten gelöscht. Bitte neue Werte setzen oder Mock‑Daten verwenden.');
+    });
+
+    document.getElementById('btn-mock').addEventListener('click', ()=>{
+      USE_MOCK.enabled = true;
+      hideBanner();
+      run();
+    });
+
+    document.getElementById('btn-validate').addEventListener('click', async ()=>{
+      try{
+        const info = await validateToken();
+        showBanner('Token gültig. Client-ID: '+CLIENT_ID+' – User: '+(info.login||'N/A'));
+      }catch(e){
+        showBanner('Token ungültig: '+e, 'error');
+      }
+    });
+
+    // Token holen (Client Credentials)
+    document.getElementById('btn-fetch-token').addEventListener('click', async ()=>{
+      const cid = (inId.value||'').trim();
+      const cs = (inSe.value||'').trim();
+      const ep = (inEp.value||'').trim();
+      try{
+        let access = '';
+        if(ep){
+          // Serverseitig holen (empfohlen)
+          const resp = await fetch(ep, { method: 'GET' });
+          if(!resp.ok) throw new Error('Server‑Endpoint Fehler: '+resp.status+' '+resp.statusText);
+          const j = await resp.json();
+          access = j.access_token || j.token || '';
+          if(!access) throw new Error('Server‑Antwort ohne access_token');
+        } else {
+          // Direkt (nur für Tests)
+          if(!cid || !cs){ showBanner('Client ID und Client Secret erforderlich, um Token direkt zu holen – oder Token‑Endpoint setzen.', 'error'); return; }
+          const resp = await fetch('https://id.twitch.tv/oauth2/token', {
+            method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ client_id: cid, client_secret: cs, grant_type: 'client_credentials' })
+          });
+          if(!resp.ok){
+            if(resp.status === 403) throw new Error('403 Forbidden – oft altes/falsches Secret. In Twitch Console **New Secret** erstellen und erneut versuchen.');
+            if(resp.status === 400) throw new Error('400 Bad Request – Parameter prüfen (client_id, client_secret, grant_type).');
+            throw new Error(resp.status+' '+resp.statusText);
+          }
+          const j = await resp.json();
+          access = j.access_token;
+        }
+        ACCESS_TOKEN = access;
+        if(cid) { CLIENT_ID = cid; localStorage.setItem(LS_KEYS.clientId, CLIENT_ID); }
+        localStorage.setItem(LS_KEYS.accessToken, ACCESS_TOKEN);
+        if(cs) { CLIENT_SECRET = cs; localStorage.setItem(LS_KEYS.clientSecret, CLIENT_SECRET); }
+        if(ep) { TOKEN_ENDPOINT = ep; localStorage.setItem(LS_KEYS.tokenEndpoint, TOKEN_ENDPOINT); }
+        inTk.value = ACCESS_TOKEN;
+        hideBanner();
+        run();
+      }catch(e){ console.error(e); showBanner('Token konnte nicht geholt werden: '+e.message, 'error'); }
+    });
+
+    // ==================
+    // 🧪 Selbst‑/Tests
+    // ==================
+    function assert(cond, msg){
+      const el = document.createElement('div');
+      el.innerHTML = (cond ? '✅ ' : '❌ ') + msg;
+      el.className = cond ? 'ok' : 'fail';
+      document.getElementById('selftest').appendChild(el);
+      if(!cond) console.warn('SelfTest:', msg);
+    }
+
+    (function selfTests(){
+      // Struktur‑Tests
+      assert(document.querySelectorAll('#offline-heading').length === 1, 'Genau eine Überschrift mit id="offline-heading" vorhanden');
+      assert(document.querySelectorAll('#offline-grid').length === 1, 'Genau ein Offline‑Grid mit id="offline-grid" vorhanden');
+      assert(document.querySelectorAll('#live-grid').length === 1, 'Genau ein Live‑Grid vorhanden');
+      // Keine doppelten IDs
+      const ids = Array.from(document.querySelectorAll('[id]')).map(e=>e.id);
+      const dup = ids.filter((id, i) => ids.indexOf(id) !== i);
+      assert(dup.length === 0, 'Keine doppelten IDs im Dokument');
+      // Sortier‑Test (Live nach Viewer DESC)
+      const sample = [ {viewer_count: 10}, {viewer_count: 55}, {viewer_count: 0}, {viewer_count: 9} ];
+      const sorted = sample.slice().sort((a,b)=> (b.viewer_count||0) - (a.viewer_count||0));
+      assert(sorted[0].viewer_count === 55 && sorted[3].viewer_count === 0, 'Sortierung Live‑Viewer absteigend funktioniert');
+      // Banner Test
+      showBanner('Simulation: Hinweis‑Banner funktioniert');
+      hideBanner();
+      assert(banner.style.display === 'none', 'Banner versteckt sich korrekt');
+      // Config/Token‑Checker
+      assert(typeof hasConfig() === 'boolean' && typeof hasToken() === 'boolean', 'Config/Token‑Checker liefern boolean');
+      // Neuer Test: Token‑Endpoint optional vorhanden
+      const ep = document.getElementById('cfg-token-endpoint');
+      assert(!!ep, 'Token‑Endpoint Eingabefeld existiert');
+    })();
+
+    // Starte initial Rendering
+    run();
+  </script>
+</body>
+</html>
