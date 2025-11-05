@@ -130,7 +130,8 @@
     const sinceText=(iso)=>{const s=new Date(iso);const m=Math.max(0,Math.round((Date.now()-s.getTime())/60000));if(m<1)return'gerade eben';if(m<60)return`seit ${m} Min`;const h=Math.floor(m/60),r=m%60;return`seit ${h} Std ${r} Min`;};
 
     function channelCard(item,isLive){
-      const url=`https://twitch.tv/${item.login}`;
+      const login = item.login || item.user_login || (item.user_name ? item.user_name.toLowerCase() : '');
+      const url = `https://twitch.tv/${login}`;
       const title=isLive?(item.title||item.display_name||item.login):(item.display_name||item.login);
       const game=isLive?(item.game_name||''):'';
       const viewers=isLive?(item.viewer_count??null):null;
@@ -186,7 +187,11 @@
         for(const c of TWITCH_CHANNELS){
           const s=liveMap.get(c.login.toLowerCase());
           if(s){s.display_name=userMap.get(c.login.toLowerCase())?.display_name||c.name;s.profile_image_url=userMap.get(c.login.toLowerCase())?.profile_image_url;live.push(s);}
+              s.login = c.login;
+
+          live.push(s);
         }
+        
         if(live.length===0){liveEmpty.style.display='block';}
         else{liveEmpty.style.display='none';live.forEach(s=>liveGrid.appendChild(channelCard(s,true)));}
 
@@ -227,4 +232,5 @@
   </script>
 </body>
 </html>
+
 
