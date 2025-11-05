@@ -132,7 +132,7 @@
     function channelCard(item,isLive){
       const login = item.login || item.user_login || (item.user_name ? item.user_name.toLowerCase() : '');
       const url = `https://twitch.tv/${login}`;
-      const title=isLive?(item.title||item.display_name||item.login):(item.display_name||item.login);
+      const title=isLive?(item.title||item.display_name||login):(item.display_name||login);
       const game=isLive?(item.game_name||''):'';
       const viewers=isLive?(item.viewer_count??null):null;
       const started=isLive?(item.started_at?sinceText(item.started_at):''):'';
@@ -186,12 +186,14 @@
         const live=[];
         for(const c of TWITCH_CHANNELS){
           const s=liveMap.get(c.login.toLowerCase());
-          if(s){s.display_name=userMap.get(c.login.toLowerCase())?.display_name||c.name;s.profile_image_url=userMap.get(c.login.toLowerCase())?.profile_image_url;live.push(s);}
-              s.login = c.login;
-
-          live.push(s);
+          if(s){
+            const u=userMap.get(c.login.toLowerCase());
+            s.display_name=u?.display_name||c.name;
+            s.profile_image_url=u?.profile_image_url;
+            s.login=c.login; // fix undefined URL
+            live.push(s);
+          }
         }
-        
         if(live.length===0){liveEmpty.style.display='block';}
         else{liveEmpty.style.display='none';live.forEach(s=>liveGrid.appendChild(channelCard(s,true)));}
 
@@ -232,5 +234,3 @@
   </script>
 </body>
 </html>
-
-
