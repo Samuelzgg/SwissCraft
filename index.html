@@ -1,236 +1,572 @@
 <!doctype html>
-<html lang="de">
+<html lang="de-CH">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Swiss Craft – Live</title>
-  <style>
-    :root{
-      --bg:#0b0b10;--card:#12121a;--muted:#a2a6b3;--text:#f3f4f6;--accent:#8b5cf6;--accent-2:#22c55e;--warn:#f59e0b;--danger:#ef4444;
-      --shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#0b0b10,#0e0e14);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-    .container{max-width:1200px;margin:40px auto;padding:0 16px}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:16px}
-    h1{font-size:clamp(22px,3vw,34px);margin:0}
-    .controls{display:flex;gap:10px;flex-wrap:wrap}
-    .pill{background:#1a1a25;border:1px solid #24243a;color:var(--text);padding:10px 14px;border-radius:999px}
-    .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:13px;border:1px solid #2a2a40;background:#151522}
-    .badge.live{border-color:rgba(139,92,246,.35);background:rgba(139,92,246,.12)}
-    .dot{width:8px;height:8px;border-radius:50%}
-    .dot.live{background:var(--accent)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:18px}
-    .card{background:var(--card);border:1px solid #1f2430;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
-    .thumb{position:relative;aspect-ratio:16/9;background:#0f0f15}
-    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-    .liveTag{position:absolute;top:10px;left:10px;background:var(--danger);color:#fff;font-size:12px;font-weight:700;padding:5px 8px;border-radius:999px}
-    .body{padding:14px 14px 16px}
-    .rowline{display:flex;align-items:center;gap:10px}
-    .avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid #2a2a40}
-    .title{font-size:16px;font-weight:700;margin:0 0 6px}
-    .meta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
-    .meta .chip{font-size:12px;border:1px solid #2a2a40;background:#161624;padding:4px 8px;border-radius:999px;color:var(--muted)}
-    .actions{display:flex;gap:10px;margin-top:12px}
-    .btn{appearance:none;border:1px solid #2a2a40;background:#141423;color:var(--text);padding:9px 12px;border-radius:12px;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
-    .btn:hover{border-color:#3a3a55;transform:translateY(-1px)}
-    .section{margin-top:32px}
-    footer{opacity:.65;margin:40px 0 24px;font-size:13px}
-    .empty{border:1px dashed #2a2a40;border-radius:14px;padding:24px;color:var(--muted);text-align:center}
-    .banner{border:1px solid #3a2a10;background:#211806;color:#f8e6c0;border-radius:12px;padding:12px;display:none;margin:12px 0}
-    .banner.error{border-color:#3a1010;background:#210d0d;color:#ffd2d2}
-    .divider{height:1px;background:#1f2430;margin:12px 0 0;opacity:.6}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SwissCraft Season 2 – A Swiss Community Minecraft Event</title>
+<meta name="description" content="SwissCraft Season 2, das Schweizer Community-Minecraft-Event: alle Streamer im Lineup, wer gerade live ist, Community Server, Archiv von Season 1 mit Map-Download.">
+<meta property="og:title" content="SwissCraft Season 2 – Official Lineup">
+<meta property="og:description" content="Live auf Twitch bei deinen Lieblingsstreamern. 09.10.2026, 20:15 Uhr.">
+<meta property="og:image" content="assets/poster.jpg">
+<meta name="theme-color" content="#D42027">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23D42027'/%3E%3Cpath d='M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ---------- Tokens ---------- */
+:root{
+  --paper:#ECE6D7; --paper-2:#DED6C1; --paper-3:#F5F1E7;
+  --ink:#171411; --ink-2:#2A2622; --ink-3:#3D3832;
+  --red:#D42027; --red-deep:#A8151B; --grass:#4FAF1F; --grass-soft:#DCEFD1;
+  --cream:#F3EEE3;
+
+  --bg:var(--paper); --fg:var(--ink); --muted:#6A6459;
+  --line:rgba(23,20,17,.22); --line-soft:rgba(23,20,17,.12);
+  --tile:var(--paper-2); --field:var(--paper-3);
+  --panel-bg:var(--ink); --panel-fg:var(--cream); --panel-muted:#A9A296; --panel-line:rgba(243,238,227,.18); --panel-tile:#221F1B;
+  --grain-blend:multiply; --grain-opacity:.5;
+
+  --display:"Anton","Impact","Arial Narrow Bold",sans-serif;
+  --cond:"Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --wrap:1120px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151310; --fg:var(--cream); --muted:#A39C90;
+    --line:rgba(243,238,227,.22); --line-soft:rgba(243,238,227,.11);
+    --tile:#26221E; --field:#1E1B18;
+    --panel-bg:#0E0C0A; --panel-fg:var(--cream); --panel-tile:#1C1916;
+    --grain-blend:screen; --grain-opacity:.18;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151310; --fg:var(--cream); --muted:#A39C90;
+  --line:rgba(243,238,227,.22); --line-soft:rgba(243,238,227,.11);
+  --tile:#26221E; --field:#1E1B18;
+  --panel-bg:#0E0C0A; --panel-fg:var(--cream); --panel-tile:#1C1916;
+  --grain-blend:screen; --grain-opacity:.18;
+}
+
+/* ---------- Base ---------- */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important;transition:none!important} }
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:var(--grain-opacity);mix-blend-mode:var(--grain-blend);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .08 0 0 0 0 .06 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+main,header,footer{position:relative;z-index:1}
+a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+img{max-width:100%;height:auto;display:block}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit}
+.wrap{width:min(var(--wrap),100% - 40px);margin-inline:auto}
+.skip{position:absolute;left:-999px;top:8px;background:var(--red);color:#fff;padding:8px 12px;z-index:100}
+.skip:focus{left:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+h1,h2,h3{margin:0;font-weight:400}
+.h-display{font-family:var(--display);text-transform:uppercase;letter-spacing:.015em;line-height:.92}
+.h-section{font-family:var(--display);text-transform:uppercase;font-size:clamp(2.6rem,7vw,4.6rem);line-height:.95;letter-spacing:.01em}
+.rule-title{display:flex;align-items:center;gap:18px;font-family:var(--cond);font-weight:600;font-size:1.05rem;letter-spacing:.32em;text-transform:uppercase}
+.rule-title::before,.rule-title::after{content:"";flex:1;height:2px;background:currentColor;opacity:.85}
+.rule-title span{white-space:nowrap}
+
+/* ---------- Topbar ---------- */
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:2px solid var(--fg)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--cond);font-weight:700;font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase}
+.brand .cross{width:22px;height:22px;background:var(--red);position:relative;flex:none}
+.brand .cross::before,.brand .cross::after{content:"";position:absolute;background:#fff;left:50%;top:50%;transform:translate(-50%,-50%)}
+.brand .cross::before{width:12px;height:4px}.brand .cross::after{width:4px;height:12px}
+.nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{font-family:var(--cond);font-weight:600;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;padding:6px 10px;white-space:nowrap;border-bottom:2px solid transparent}
+.nav a:hover{border-bottom-color:var(--red)}
+.nav .live-pill{display:none;align-items:center;gap:6px;color:var(--grass)}
+.nav .live-pill.on{display:inline-flex}
+.dot{width:9px;height:9px;background:var(--grass);display:inline-block;flex:none;box-shadow:0 0 0 0 rgba(79,175,31,.55);animation:pulse 1.8s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(79,175,31,.55)}100%{box-shadow:0 0 0 9px rgba(79,175,31,0)}}
+
+@media (max-width:520px){.brand{font-size:.95rem;letter-spacing:.1em}.nav a{font-size:.9rem;padding:6px 7px}}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;padding:36px 0 22px;text-align:center;overflow:hidden}
+.hero .stairs{position:absolute;width:150px;height:150px;pointer-events:none;color:var(--red)}
+.hero .stairs.tl{left:0;top:0}
+.hero .stairs.br{right:0;bottom:0;transform:rotate(180deg)}
+.hero .side{position:absolute;top:120px;font-family:var(--cond);font-weight:600;font-size:1.1rem;letter-spacing:.3em;text-transform:uppercase;line-height:1.6;text-align:left}
+.hero .side.l{left:24px}
+.hero .side.r{right:24px;text-align:right}
+.hero .side b{display:block;width:44px;height:2px;background:currentColor;margin:14px 0}
+.hero .side.r b{margin-left:auto}
+@media (max-width:1000px){.hero .side{display:none}}
+@media (max-width:640px){.hero .stairs{width:84px;height:84px}.hero .stairs.br{display:none}}
+.hero-logo{width:min(560px,86%);margin:0 auto 6px}
+.hero-title{font-size:clamp(4rem,16vw,12rem);white-space:nowrap}
+.hero-meta{display:flex;justify-content:center;align-items:center;gap:22px;margin:14px 0 6px;font-family:var(--display);text-transform:uppercase;font-size:clamp(1.8rem,6vw,3.4rem);line-height:1}
+.hero-meta .date{color:var(--red)}
+.hero-meta .bar{width:4px;height:.9em;background:var(--fg)}
+.hero-sub{font-family:var(--cond);font-weight:600;font-size:clamp(1.05rem,2.6vw,1.35rem);letter-spacing:.2em;text-transform:uppercase;margin:6px 0 0}
+
+/* ---------- Live board ---------- */
+.live{padding:14px 0 54px}
+.board{border:3px solid var(--fg);background:var(--field);padding:22px 22px 20px}
+.board-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.board-head h2{font-family:var(--display);text-transform:uppercase;font-size:clamp(1.9rem,5vw,2.8rem);line-height:1;display:flex;align-items:center;gap:12px}
+.board-head h2 .dot{width:14px;height:14px}
+.board-note{font-family:var(--cond);font-weight:500;font-size:1rem;letter-spacing:.06em;color:var(--muted)}
+.countdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:6px 0 4px}
+.countdown>div{text-align:center;border:2px solid var(--line);padding:12px 4px 10px}
+.countdown .n{font-family:var(--display);font-size:clamp(2.2rem,8vw,4.4rem);line-height:1;font-variant-numeric:tabular-nums}
+.countdown .l{font-family:var(--cond);font-weight:600;letter-spacing:.2em;text-transform:uppercase;font-size:.85rem;color:var(--muted);margin-top:4px}
+.countdown-text{margin:12px 0 0;font-family:var(--cond);font-weight:500;font-size:1.15rem}
+.live-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:6px}
+.live-card{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;border:2px solid var(--grass);background:var(--bg);padding:12px 14px;text-decoration:none}
+.live-card .av{width:52px;height:52px;background:var(--tile);border:2px solid var(--fg);object-fit:cover;font-family:var(--display);font-size:1.7rem;display:grid;place-items:center}
+.live-card .who{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:1.35rem;line-height:1.05}
+.live-card .ttl{font-size:.95rem;line-height:1.3;margin:4px 0 6px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.live-card .vw{font-family:var(--cond);font-weight:600;letter-spacing:.06em;font-size:.95rem;color:var(--grass);text-transform:uppercase}
+.live-empty{font-family:var(--cond);font-weight:500;font-size:1.15rem;margin:0}
+.live-empty a{color:var(--red)}
+.demo-banner{background:var(--red);color:#fff;font-family:var(--cond);font-weight:600;letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:6px 10px;font-size:.9rem}
+
+/* ---------- Lineup ---------- */
+.lineup{padding:12px 0 64px}
+.section-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:26px}
+.section-head .rule-title{width:min(720px,100%)}
+.lineup-tools{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.search{display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--fg);padding:4px 0}
+.search input{border:0;background:transparent;font-family:var(--cond);font-weight:500;font-size:1.1rem;letter-spacing:.04em;width:220px;color:inherit;padding:4px 0}
+.search input::placeholder{color:var(--muted)}
+.poster-link{display:inline-flex;align-items:center;gap:12px;text-decoration:none;font-family:var(--cond);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.95rem}
+.poster-link img{width:38px;height:54px;object-fit:cover;border:2px solid var(--fg)}
+.poster-link:hover{color:var(--red)}
+.grid{display:grid;grid-template-columns:1fr;gap:2px;border:2px solid var(--fg);padding:2px}
+@media (min-width:700px){.grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}}
+.card{position:relative;background:var(--bg);box-shadow:0 0 0 1px var(--line);padding:12px 14px;display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 12px;min-height:0}
+.card-top{flex:1 1 auto;min-width:0}
+.card .pills{margin-top:0;flex:0 0 auto}
+.card .ttl{flex-basis:100%;order:3}
+@media (min-width:700px){.card{padding:18px 18px 16px;min-height:150px;flex-direction:column;align-items:stretch;gap:12px}.card .pills{margin-top:auto}.card .ttl{flex-basis:auto;order:0}}
+.card::before{content:"";position:absolute;left:-8px;top:-8px;width:14px;height:14px;z-index:2;pointer-events:none;
+  background:linear-gradient(var(--red),var(--red)) center/14px 4px no-repeat,linear-gradient(var(--red),var(--red)) center/4px 14px no-repeat}
+.card.hidden{display:none}
+.card-top{display:flex;gap:12px;align-items:center}
+.card .av{width:44px;height:44px;flex:none;background:var(--tile);border:2px solid var(--fg);font-family:var(--display);font-size:1.6rem;display:grid;place-items:center;object-fit:cover;text-transform:uppercase}
+.card .name{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.2rem,4vw,1.45rem);line-height:1.02;letter-spacing:.01em;overflow-wrap:anywhere}
+.card .state{font-family:var(--cond);font-weight:600;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.card .state .dot{display:none}
+.card.is-live{background:var(--field);box-shadow:0 0 0 1px var(--line),inset 0 0 0 3px var(--grass)}
+.card.is-live .state{color:var(--grass)}
+.card.is-live .state .dot{display:inline-block}
+.card.is-live .av{border-color:var(--grass)}
+.card .ttl{display:none;font-size:.92rem;line-height:1.3;color:var(--muted);margin:-4px 0 0}
+.card.is-live .ttl{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.pill{font-family:var(--cond);font-weight:600;font-size:.9rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border:2px solid var(--fg);padding:3px 9px;line-height:1.2}
+.pill:hover{background:var(--fg);color:var(--bg)}
+.pill.twitch:hover{background:#9146FF;border-color:#9146FF;color:#fff}
+.pill.live{background:var(--grass);border-color:var(--grass);color:#fff}
+.pill.live:hover{background:#3d8f16;border-color:#3d8f16}
+.pill.none{border-style:dashed;color:var(--muted);pointer-events:none}
+.empty-search{display:none;text-align:center;padding:40px 20px;font-family:var(--cond);font-weight:500;font-size:1.2rem}
+.empty-search.on{display:block}
+
+/* ---------- Community strip ---------- */
+.community{background:var(--red);color:#fff;padding:34px 0}
+.community .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center}
+@media (max-width:760px){.community .wrap{grid-template-columns:1fr}}
+.community h2{font-family:var(--display);text-transform:uppercase;font-size:clamp(2.1rem,5.5vw,3.4rem);line-height:.95}
+.community p{margin:10px 0 0;font-size:1.05rem;max-width:52ch}
+.ip-box{background:#fff;color:var(--ink);border:3px solid var(--ink);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.ip-box .lbl{font-family:var(--cond);font-weight:600;font-size:.85rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.ip-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ip{font-family:var(--cond);font-weight:700;font-size:1.7rem;letter-spacing:.03em;overflow-wrap:anywhere}
+.ip.tba{font-weight:500;font-size:1.15rem;color:var(--muted)}
+.btn{font-family:var(--cond);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:.95rem;border:2px solid var(--ink);background:var(--ink);color:#fff;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;line-height:1.2}
+.btn:hover{background:var(--red);border-color:var(--red)}
+.btn.ghost{background:transparent;color:inherit}
+.btn.ghost:hover{background:var(--ink);color:#fff}
+.btn[disabled],.btn.disabled{opacity:.5;cursor:not-allowed;pointer-events:none}
+.ip-box .links{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+
+
+/* ---------- Archive (Season 1) ---------- */
+.ridge{display:block;width:100%;height:auto;background:var(--bg);color:var(--panel-bg);margin-bottom:-1px}
+.archive{background:var(--panel-bg);color:var(--panel-fg);padding:28px 0 72px}
+.archive .rule-title{color:var(--panel-muted)}
+.archive-head{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;margin-bottom:40px}
+@media (max-width:640px){.archive-head{grid-template-columns:1fr;text-align:center;justify-items:center}}
+.s1-logo{width:150px;height:150px;background:#fff;padding:10px;border:3px solid var(--panel-fg)}
+.s1-logo img{width:100%;height:100%;object-fit:contain}
+.archive-head p{margin:8px 0 0;max-width:56ch;color:var(--panel-muted);font-size:1.05rem}
+.archive-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:40px;align-items:start}
+@media (max-width:860px){.archive-grid{grid-template-columns:1fr}}
+.block-title{font-family:var(--cond);font-weight:700;font-size:1.25rem;letter-spacing:.14em;text-transform:uppercase;border-bottom:2px solid var(--panel-line);padding-bottom:8px;margin-bottom:14px}
+.video{position:relative;aspect-ratio:16/9;background:var(--panel-tile);border:3px solid var(--panel-fg);overflow:hidden}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video .facade{position:absolute;inset:0;display:grid;place-items:center;text-decoration:none;color:inherit;background:center/cover no-repeat;cursor:pointer;border:0;padding:0;width:100%}
+.video .facade::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.55))}
+.video .play{position:relative;z-index:1;font-family:var(--cond);font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--red);color:#fff;padding:12px 18px;font-size:1rem}
+.video .soon{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px}
+.video .soon .t{font-family:var(--display);text-transform:uppercase;font-size:clamp(1.6rem,4vw,2.4rem);line-height:1}
+.video .soon .s{font-family:var(--cond);font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:.9rem;color:var(--panel-muted);margin-top:8px}
+.wall{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.25rem,3.2vw,1.55rem);line-height:1.6;letter-spacing:.02em;text-align:center;margin:0}
+.wall a{text-decoration:none;white-space:nowrap}
+.wall a:hover{color:var(--red);text-decoration:underline}
+.wall a.is-live{color:var(--grass)}
+.wall a.is-live::before{content:"";display:inline-block;width:9px;height:9px;background:var(--grass);margin-right:6px;vertical-align:.1em;animation:pulse 1.8s ease-out infinite}
+.wall .plus{color:var(--red);padding:0 .5em;font-weight:600}
+.map{background:var(--panel-tile);border:3px solid var(--panel-fg);padding:20px}
+.map .t{font-family:var(--display);text-transform:uppercase;font-size:clamp(1.8rem,4vw,2.4rem);line-height:1}
+.map p{margin:8px 0 14px;color:var(--panel-muted);font-size:1rem}
+.map dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0 0 16px;font-family:var(--cond);font-size:1rem}
+.map dt{font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--panel-muted);font-size:.85rem;padding-top:2px}
+.map dd{margin:0;font-weight:500}
+.map .btn{border-color:var(--red);background:var(--red)}
+.map .btn:hover{background:#fff;color:var(--ink);border-color:#fff}
+.map .btn.disabled{background:transparent;border-color:var(--panel-line);color:var(--panel-muted)}
+
+/* ---------- Footer ---------- */
+footer{background:var(--panel-bg);color:var(--panel-fg);position:relative}
+.foot{border-top:2px solid var(--panel-line);padding:26px 0 34px}
+.foot .wrap{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.foot .tag{font-family:var(--display);text-transform:uppercase;font-size:1.6rem;line-height:1;position:relative;display:inline-block}
+.foot .tag::after{content:"";display:block;height:4px;background:var(--red);margin-top:6px;transform:skewX(-20deg)}
+.foot nav{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--cond);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:.95rem}
+.foot nav a{text-decoration:none}
+.foot nav a:hover{color:var(--red)}
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Swiss Craft</h1>
-      <div class="controls">
-        <span class="badge live"><span class="dot live"></span> Live</span>
-        <span class="pill" id="last-updated">Aktualisiert: –</span>
-        <button class="btn" id="refresh">Neu laden</button>
-      </div>
-    </header>
+<a class="skip" href="#lineup">Zum Lineup springen</a>
 
-    <div id="banner" class="banner"></div>
-
-    <!-- Live Section -->
-    <section class="section" aria-labelledby="live-heading">
-      <h2 id="live-heading">Gerade live</h2>
-      <div id="live-grid" class="grid"></div>
-      <div id="live-empty" class="empty" style="display:none">Derzeit ist niemand live.</div>
-    </section>
-
-    <!-- Twitch roster stacked -->
-    <section class="section" aria-labelledby="roster-twitch-heading">
-      <h2 id="roster-twitch-heading">Teilnehmer – Twitch</h2>
-      <div class="divider"></div>
-      <div id="roster-twitch" class="grid"></div>
-    </section>
-
-    <!-- Other platforms roster stacked -->
-    <section class="section" aria-labelledby="roster-other-heading">
-      <h2 id="roster-other-heading">Teilnehmer – Andere Plattformen</h2>
-      <div class="divider"></div>
-      <div id="roster-other" class="grid"></div>
-    </section>
-
-    <footer>
-      <div>Automatische Aktualisierung alle 60 Sekunden. Datenquelle: Twitch Helix API.</div>
-    </footer>
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="cross" aria-hidden="true"></span>SwissCraft <span style="color:var(--red)">&nbsp;S2</span></a>
+    <nav class="nav" aria-label="Seitennavigation">
+      <a href="#live" class="live-pill" id="navLive"><span class="dot"></span><span id="navLiveCount">0</span> live</a>
+      <a href="#lineup">Lineup</a>
+      <a href="#community">Server</a>
+      <a href="#archiv">Season 1</a>
+    </nav>
   </div>
+</header>
 
-  <script>
-    const CLIENT_ID = "zxg5h7z2fm3cli0ywa7j84gk1xang7";
-    const ACCESS_TOKEN = "kbttz8dmt97re9w6urwedgkyofwm5a";
+<main>
+  <section class="hero" id="top">
+    <svg class="stairs tl" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor" d="M0 0h60v20H40v20H20v20H0z"/></svg>
+    <svg class="stairs br" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor" d="M0 0h60v20H40v20H20v20H0z"/></svg>
+    <div class="side l" aria-hidden="true">Build<br>Explore<br>Survive<br>Together<b></b>A Swiss<br>Community<br>Minecraft<br>Event</div>
+    <div class="side r" aria-hidden="true">More<br>than<br>a game<b></b>People<br>build<br>better<br>stories.</div>
 
-    const TWITCH_CHANNELS = [
-      { name: 'MaeloRomani', login: 'maeloromani' },
-      { name: 'Elijah Tetilla', login: 'elijahtetillaa' },
-      { name: 'laisalicious', login: 'laisalicious' },
-      { name: 'Naxlani', login: 'naxlani' },
-      { name: 'SandroSchmitter', login: 'sandroschmitter' },
-      { name: 'JenniferJordii', login: 'jenniferjordii' },
-      { name: 'SamuSari', login: 'samusari' },
-      { name: 'Strike', login: 'strike' },
-      { name: 'prinznorin', login: 'prinznorin' },
-      { name: 'Samuel.zgg', login: 'samuel_zgg' },
-      { name: 'Nimmbaa', login: 'nimmbaa' },
-      { name: 'Sändu2k', login: 'saendu2k' },
-      { name: 'Monkeey99', login: 'monkeey99' },
-      { name: 'DreamyRere', login: 'dreamyrere' },
-      { name: 'Sir_Cooli', login: 'sir_cooli' },
-      { name: 'gery_live', login: 'gery_live' },
-      { name: 'Jakofski37', login: 'jakofski37' },
-      { name: 'KxEx', login: 'iamkxex' },
-      { name: 'onklskoko', login: 'onklskoko' },
-      { name: 'its_Mauz1', login: 'its_mauz1' },
-      { name: 'Helagon', login: 'helagon_' },
-      { name: 'Serox', login: 'itzseroxlive' },
-      { name: 'TechnobirdxD', login: 'technobirdxd' }
-    ];
+    <div class="wrap">
+      <img class="hero-logo" src="assets/logo-s2.webp" alt="SwissCraft Logo" width="1232" height="973" fetchpriority="high">
+      <h1 class="h-display hero-title">Season 2</h1>
+      <div class="hero-meta">
+        <span class="date" id="heroDate">09.10.2026</span>
+        <span class="bar" aria-hidden="true"></span>
+        <span id="heroTime">20:15 Uhr</span>
+      </div>
+      <p class="hero-sub">Live auf Twitch bei deinen Lieblingsstreamern</p>
+    </div>
+  </section>
 
-    const OTHER_LINKS = [
-      { name: 'ML Gamer', url: 'https://www.tiktok.com/@ml_gameryt', platform: 'TikTok' },
-      { name: 'ddy.davee', url: 'https://www.tiktok.com/@ddy.davee', platform: 'TikTok' },
-      { name: 'Logik66', url: 'https://www.tiktok.com/@logiksixtysix', platform: 'TikTok' }
-    ];
+  <section class="live" id="live" aria-labelledby="liveTitle">
+    <div class="wrap">
+      <div class="board">
+        <div id="demoBanner" class="demo-banner" hidden>Demo-Ansicht: Live-Status ist simuliert</div>
+        <div class="board-head">
+          <h2 id="liveTitle"><span class="dot" id="boardDot" hidden></span><span id="boardTitle">Bis zum Start</span></h2>
+          <p class="board-note" id="boardNote"></p>
+        </div>
+        <div id="countdown" class="countdown" hidden>
+          <div><div class="n" id="cdD">0</div><div class="l">Tage</div></div>
+          <div><div class="n" id="cdH">00</div><div class="l">Std</div></div>
+          <div><div class="n" id="cdM">00</div><div class="l">Min</div></div>
+          <div><div class="n" id="cdS">00</div><div class="l">Sek</div></div>
+        </div>
+        <p class="countdown-text" id="countdownText" hidden></p>
+        <div id="liveList" class="live-list" hidden></div>
+        <p id="liveEmpty" class="live-empty" hidden></p>
+      </div>
+    </div>
+  </section>
 
-    const liveGrid=document.getElementById('live-grid');
-    const liveEmpty=document.getElementById('live-empty');
-    const rosterTwitch=document.getElementById('roster-twitch');
-    const rosterOther=document.getElementById('roster-other');
-    const lastUpdated=document.getElementById('last-updated');
-    const banner=document.getElementById('banner');
+  <section class="lineup" id="lineup" aria-labelledby="lineupTitle">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="h-section" id="lineupTitle">Official Lineup</h2>
+        <div class="rule-title"><span>Season 2</span></div>
+      </div>
+      <div class="lineup-tools">
+        <label class="search"><span class="sr">Streamer suchen</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input type="search" id="search" placeholder="Streamer suchen" autocomplete="off">
+        </label>
+        <a class="poster-link" href="assets/poster.jpg" target="_blank" rel="noopener"><img src="assets/poster-thumb.jpg" alt="" width="38" height="54">Lineup-Poster ansehen</a>
+      </div>
+      <div class="grid" id="grid"></div>
+      <p class="empty-search" id="emptySearch">Niemand mit diesem Namen im Lineup.</p>
+    </div>
+  </section>
 
-    const showBanner=(m,t='warn')=>{banner.textContent=m;banner.className='banner '+(t==='error'?'error':'');banner.style.display='block';};
-    const hideBanner=()=>{banner.style.display='none';};
-    const fmtTime=(d)=>new Intl.DateTimeFormat(undefined,{dateStyle:'short',timeStyle:'short'}).format(d);
-    const sinceText=(iso)=>{const s=new Date(iso);const m=Math.max(0,Math.round((Date.now()-s.getTime())/60000));if(m<1)return'gerade eben';if(m<60)return`seit ${m} Min`;const h=Math.floor(m/60),r=m%60;return`seit ${h} Std ${r} Min`;};
+  <section class="community" id="community" aria-labelledby="communityTitle">
+    <div class="wrap">
+      <div>
+        <h2 id="communityTitle">Selber bauen statt nur zuschauen</h2>
+        <p>Der SwissCraft Community Server ist offen für alle. Alle Infos, die Regeln und die Server-Adresse findest du im Discord.</p>
+      </div>
+      <div class="ip-box">
+        <span class="lbl">Community Server</span>
+        <div class="ip-row">
+          <span class="ip" id="discordText">Discord folgt</span>
+        </div>
+        <div class="links">
+          <a class="btn" id="discordBtn" href="#" target="_blank" rel="noopener" hidden>Discord beitreten</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    function channelCard(item,isLive){
-      const login = item.login || item.user_login || (item.user_name ? item.user_name.toLowerCase() : '');
-      const url = `https://twitch.tv/${login}`;
-      const title=isLive?(item.title||item.display_name||login):(item.display_name||login);
-      const game=isLive?(item.game_name||''):'';
-      const viewers=isLive?(item.viewer_count??null):null;
-      const started=isLive?(item.started_at?sinceText(item.started_at):''):'';
-      const thumb=isLive&&item.thumbnail_url?item.thumbnail_url.replace('{width}','640').replace('{height}','360'):null;
 
-      const card=document.createElement('article');card.className='card';
-      const thumbDiv=document.createElement('div');thumbDiv.className='thumb';
-      if(thumb){const img=document.createElement('img');img.loading='lazy';img.src=thumb+`?t=${Date.now()}`;thumbDiv.appendChild(img);const tag=document.createElement('div');tag.className='liveTag';tag.textContent='LIVE';thumbDiv.appendChild(tag);}
-      card.appendChild(thumbDiv);
+  <svg class="ridge" viewBox="0 0 1200 150" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="currentColor" opacity=".45" d="M0 150V78l70-40 60 32 80-58 90 50 70-46 90 62 80-70 90 56 70-38 90 60 100-72 90 60 70-30 80 40 70-28v94z"/>
+    <path fill="currentColor" d="M0 150V108l60-26 70 30 90-54 80 42 90-62 100 58 70-34 90 46 80-56 90 48 90-30 80 40 90-52 70 40 50-22V150z"/>
+  </svg>
+  <section class="archive" id="archiv" aria-labelledby="archiveTitle">
+    <div class="wrap">
+      <div class="archive-head">
+        <div class="s1-logo"><img src="assets/logo-s1.webp" alt="SwissCraft Season 1 Logo" width="467" height="528"></div>
+        <div>
+          <div class="rule-title" style="max-width:320px"><span>Archiv</span></div>
+          <h2 class="h-section" id="archiveTitle" style="margin-top:8px">Season 1</h2>
+          <p>Wo alles angefangen hat. Das Best-of, alle Teilnehmer der ersten Staffel und die komplette Map zum Herunterladen.</p>
+        </div>
+      </div>
 
-      const body=document.createElement('div');body.className='body';
-      const row=document.createElement('div');row.className='rowline';
-      if(item.profile_image_url){const av=document.createElement('img');av.className='avatar';av.src=item.profile_image_url;row.appendChild(av);}
-      const h3=document.createElement('h3');h3.className='title';h3.textContent=title;row.appendChild(h3);body.appendChild(row);
+      <div class="archive-grid">
+        <div>
+          <div class="block-title">Best-of Season 1</div>
+          <div class="video" id="video"></div>
+        </div>
+        <div>
+          <div class="block-title">Map Download</div>
+          <div class="map">
+            <div class="t">Die Season-1-Welt</div>
+            <p>Lade die Original-Map herunter und schau dir alle Builds selbst an.</p>
+            <dl>
+              <dt>Version</dt><dd id="mapVersion">folgt</dd>
+              <dt>Grösse</dt><dd id="mapSize">folgt</dd>
+            </dl>
+            <a class="btn" id="mapBtn" href="#">Map herunterladen</a>
+          </div>
+        </div>
+      </div>
 
-      const actions=document.createElement('div');actions.className='actions';
-      const a=document.createElement('a');a.className='btn';a.href=url;a.target='_blank';a.rel='noopener';a.textContent='Zum Stream';actions.appendChild(a);body.appendChild(actions);
+      <div style="margin-top:44px">
+        <div class="block-title" style="text-align:center">Teilnehmer Season 1</div>
+        <p class="wall" id="wall1"></p>
+      </div>
+    </div>
+  </section>
+</main>
 
-      const meta=document.createElement('div');meta.className='meta';
-      if(isLive&&game){const chip=document.createElement('span');chip.className='chip';chip.textContent=`Spiel: ${game}`;meta.appendChild(chip);}
-      if(isLive&&viewers!=null){const chip=document.createElement('span');chip.className='chip';chip.textContent=`${viewers} Zuschauer`;meta.appendChild(chip);}
-      if(isLive&&started){const chip=document.createElement('span');chip.className='chip';chip.textContent=started;meta.appendChild(chip);}
-      body.appendChild(meta);
+<footer>
+  <div class="foot">
+    <div class="wrap">
+      <span class="tag">It's a Minecraft thing.</span>
+      <nav aria-label="Footer">
+        <a id="igLink" href="https://www.instagram.com/swisscraftofficial/" target="_blank" rel="noopener">Instagram @swisscraftofficial</a>
+        <a id="impressumLink" href="#" hidden>Impressum</a>
+        <a href="#top">Nach oben</a>
+      </nav>
+    </div>
+  </div>
+</footer>
 
-      card.appendChild(body);return card;
+<script src="config.js"></script>
+<script src="participants.js"></script>
+<script>
+(function () {
+  "use strict";
+  var C = window.SWISSCRAFT_CONFIG || {};
+  var D = window.SWISSCRAFT_DATA || { people: {}, season2: [], season1: [] };
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]; }); };
+  var params = new URLSearchParams(location.search);
+  var DEMO = params.has("demo") || location.hash === "#demo";
+
+  function person(id) { var p = D.people[id]; return p ? Object.assign({ id: id }, p) : null; }
+  var s2 = (D.season2 || []).map(person).filter(function (p) { return p && p.announced !== false; });
+  var s1 = (D.season1 || []).map(person).filter(function (p) { return p && p.announced !== false; });
+
+  function channels(p) {
+    var out = [];
+    if (p.twitch) out.push({ k: "twitch", label: "Twitch", href: "https://www.twitch.tv/" + p.twitch });
+    if (p.tiktok) out.push({ k: "tiktok", label: "TikTok", href: "https://www.tiktok.com/@" + p.tiktok });
+    if (p.youtube) out.push({ k: "youtube", label: "YouTube", href: "https://www.youtube.com/@" + p.youtube });
+    if (p.instagram) out.push({ k: "instagram", label: "Instagram", href: "https://www.instagram.com/" + p.instagram + "/" });
+    return out;
+  }
+  function mainLink(p) { var c = channels(p); return c.length ? c[0].href : null; }
+  function initial(p) { return (p.name || "?").replace(/[^a-z0-9]/gi, "").charAt(0) || "?"; }
+
+  /* ---- Hero / config ---- */
+  if (C.seasonStartLabel) $("heroDate").textContent = C.seasonStartLabel;
+  if (C.seasonStartTime) $("heroTime").textContent = C.seasonStartTime;
+  if (C.impressumUrl) { $("impressumLink").href = C.impressumUrl; $("impressumLink").hidden = false; }
+  if (C.instagramHandle) { $("igLink").href = "https://www.instagram.com/" + C.instagramHandle + "/"; $("igLink").textContent = "Instagram @" + C.instagramHandle; }
+
+  /* ---- Lineup grid ---- */
+  var grid = $("grid");
+  grid.innerHTML = s2.map(function (p) {
+    var ch = channels(p);
+    var pills = ch.map(function (c) { return '<a class="pill ' + c.k + '" href="' + esc(c.href) + '" target="_blank" rel="noopener">' + c.label + "</a>"; }).join("");
+    if (!ch.length) pills = '<span class="pill none">Kanal folgt</span>';
+    return '<article class="card" data-id="' + esc(p.id) + '" data-name="' + esc(p.name.toLowerCase()) + '"' + (p.twitch ? ' data-twitch="' + esc(p.twitch.toLowerCase()) + '"' : "") + (p.tiktok ? ' data-tiktok="' + esc(p.tiktok.toLowerCase()) + '"' : "") + ">" +
+      '<div class="card-top"><div class="av" data-av>' + esc(initial(p)) + "</div>" +
+      '<div><div class="name">' + esc(p.name) + '</div><div class="state"><span class="dot"></span><span data-state>' + (ch.length ? "" : "") + "</span></div></div></div>" +
+      '<p class="ttl" data-ttl></p>' +
+      '<div class="pills">' + pills + "</div></article>";
+  }).join("");
+
+  $("search").addEventListener("input", function (e) {
+    var q = e.target.value.trim().toLowerCase(), n = 0;
+    grid.querySelectorAll(".card").forEach(function (c) { var hit = !q || c.dataset.name.indexOf(q) > -1 || (c.dataset.twitch || "").indexOf(q) > -1; c.classList.toggle("hidden", !hit); if (hit) n++; });
+    $("emptySearch").classList.toggle("on", n === 0);
+  });
+
+  /* ---- Season 1 wall ---- */
+  $("wall1").innerHTML = s1.map(function (p) {
+    var href = mainLink(p);
+    var attrs = (p.twitch ? ' data-twitch="' + esc(p.twitch.toLowerCase()) + '"' : "");
+    return href ? '<a href="' + esc(href) + '" target="_blank" rel="noopener"' + attrs + ">" + esc(p.name) + "</a>" : "<span" + attrs + ">" + esc(p.name) + "</span>";
+  }).join('<span class="plus" aria-hidden="true">+</span> ');
+
+  /* ---- Community server (Discord) ---- */
+  if (C.discordUrl) {
+    $("discordBtn").href = C.discordUrl; $("discordBtn").hidden = false;
+    $("discordText").textContent = C.discordUrl.replace(/^https?:\/\/(www\.)?/, "");
+  } else { $("discordText").classList.add("tba"); }
+
+  /* ---- Archive: video + map ---- */
+  var v = $("video");
+  if (C.youtubeBestOfId) {
+    var id = String(C.youtubeBestOfId).replace(/[^A-Za-z0-9_-]/g, "");
+    v.innerHTML = '<button class="facade" type="button" style="background-image:url(https://i.ytimg.com/vi/' + id + '/hqdefault.jpg)" aria-label="Best-of Video abspielen"><span class="play">Best-of abspielen</span></button>';
+    v.querySelector(".facade").addEventListener("click", function () {
+      v.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0" title="SwissCraft Season 1 – Best-of" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    });
+  } else {
+    v.innerHTML = '<div class="soon"><div><div class="t">Best-of kommt bald</div><div class="s">Wird auf YouTube veröffentlicht</div></div></div>';
+  }
+  if (C.mapVersion) $("mapVersion").textContent = C.mapVersion;
+  if (C.mapSize) $("mapSize").textContent = C.mapSize;
+  var mb = $("mapBtn");
+  if (C.mapDownloadUrl) {
+    mb.href = C.mapDownloadUrl;
+    if (/drive\.google\.com\/drive\/folders/.test(C.mapDownloadUrl)) { mb.textContent = "Map auf Google Drive öffnen"; mb.target = "_blank"; mb.rel = "noopener"; }
+    else mb.setAttribute("download", "");
+  }
+  else { mb.classList.add("disabled"); mb.setAttribute("aria-disabled", "true"); mb.textContent = "Download folgt"; mb.removeAttribute("href"); }
+
+  /* ---- Countdown ---- */
+  var start = C.seasonStart ? new Date(C.seasonStart) : null;
+  var started = !start || isNaN(start) || Date.now() >= start.getTime();
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function tickCountdown() {
+    var diff = start.getTime() - Date.now();
+    if (diff <= 0) { started = true; renderBoard(); return; }
+    var d = Math.floor(diff / 864e5), h = Math.floor(diff / 36e5) % 24, m = Math.floor(diff / 6e4) % 60, s = Math.floor(diff / 1e3) % 60;
+    $("cdD").textContent = d; $("cdH").textContent = pad(h); $("cdM").textContent = pad(m); $("cdS").textContent = pad(s);
+    setTimeout(tickCountdown, 1000);
+  }
+
+  /* ---- Live status ---- */
+  var live = { twitch: {}, tiktok: {}, avatars: {}, ok: false, at: null };
+  var allLogins = {};
+  s2.concat(s1).forEach(function (p) { if (p.twitch) allLogins[p.twitch.toLowerCase()] = true; });
+  var loginList = Object.keys(allLogins);
+
+  function renderBoard() {
+    var liveArr = Object.keys(live.twitch).map(function (k) { return live.twitch[k]; }).sort(function (a, b) { return (b.viewers || 0) - (a.viewers || 0); });
+    var count = liveArr.length + Object.keys(live.tiktok).length;
+    $("navLive").classList.toggle("on", count > 0); $("navLiveCount").textContent = count;
+    $("countdown").hidden = started; $("countdownText").hidden = started;
+    $("boardDot").hidden = count === 0;
+    if (!started) {
+      $("boardTitle").textContent = count ? count + " jetzt live" : "Bis zum Start";
+      $("countdownText").textContent = "Season 2 startet am " + (C.seasonStartLabel || "09.10.2026") + " um " + (C.seasonStartTime || "20:15 Uhr") + ", live bei allen Streamern gleichzeitig.";
+    } else {
+      $("boardTitle").textContent = count ? count + " jetzt live" : "Gerade niemand live";
     }
-
-    async function fetchStreams(logins){
-      const p=new URLSearchParams();logins.forEach(l=>p.append('user_login',l));
-      const res=await fetch('https://api.twitch.tv/helix/streams?'+p,{headers:{'Client-ID':CLIENT_ID,'Authorization':'Bearer '+ACCESS_TOKEN}});
-      if(!res.ok)throw new Error('Streams Fehler: '+res.status);return(await res.json()).data||[];
+    var list = $("liveList"), empty = $("liveEmpty");
+    if (liveArr.length) {
+      list.hidden = false; empty.hidden = true;
+      list.innerHTML = liveArr.map(function (s) {
+        var p = s2.concat(s1).filter(function (x) { return x.twitch && x.twitch.toLowerCase() === s.login; })[0] || { name: s.login };
+        var av = live.avatars[s.login];
+        return '<a class="live-card" href="https://www.twitch.tv/' + esc(s.login) + '" target="_blank" rel="noopener">' +
+          (av ? '<img class="av" src="' + esc(av) + '" alt="" loading="lazy">' : '<div class="av">' + esc(initial(p)) + "</div>") +
+          '<div><div class="who">' + esc(p.name) + '</div><div class="ttl">' + esc(s.title || "Minecraft") + '</div><div class="vw">' + (s.viewers != null ? s.viewers + " Zuschauer" : "Live auf Twitch") + "</div></div></a>";
+      }).join("");
+    } else {
+      list.hidden = true; list.innerHTML = "";
+      if (started) {
+        empty.hidden = false;
+        empty.innerHTML = live.ok ? 'Sobald jemand aus dem Lineup Minecraft streamt, erscheint er hier. Bis dahin: <a href="#lineup">alle Kanäle im Lineup</a>.' : 'Live-Anzeige folgt. Schau direkt bei den Streamern im <a href="#lineup">Lineup</a> vorbei.';
+      } else { empty.hidden = true; }
     }
+    $("boardNote").textContent = (live.ok && live.at) ? "Stand " + live.at.toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" }) + " Uhr" : "";
 
-    async function fetchUsers(logins){
-      const p=new URLSearchParams();logins.forEach(l=>p.append('login',l));
-      const res=await fetch('https://api.twitch.tv/helix/users?'+p,{headers:{'Client-ID':CLIENT_ID,'Authorization':'Bearer '+ACCESS_TOKEN}});
-      if(!res.ok)throw new Error('Users Fehler: '+res.status);return(await res.json()).data||[];
-    }
+    // cards + wall
+    grid.querySelectorAll(".card").forEach(function (c) {
+      var t = c.dataset.twitch, tk = c.dataset.tiktok, s = t && live.twitch[t], onTk = tk && live.tiktok[tk];
+      var isLive = !!(s || onTk);
+      c.classList.toggle("is-live", isLive);
+      c.style.order = isLive ? (s ? "-" + (10000 + (s.viewers || 0)) : "-1") : "";
+      var st = c.querySelector("[data-state]");
+      st.textContent = s ? "Live · " + (s.viewers != null ? s.viewers + " Zuschauer" : "Minecraft") : (onTk ? "Live auf TikTok" : "");
+      c.querySelector("[data-ttl]").textContent = s ? (s.title || "") : "";
+      var tp = c.querySelector(".pill.twitch"); if (tp) { tp.classList.toggle("live", !!s); tp.textContent = s ? "Jetzt zuschauen" : "Twitch"; }
+      var kp = c.querySelector(".pill.tiktok"); if (kp) { kp.classList.toggle("live", !!onTk); kp.textContent = onTk ? "Jetzt zuschauen" : "TikTok"; }
+      var av = c.querySelector("[data-av]"), url = t && live.avatars[t];
+      if (url && av.tagName !== "IMG") { var img = document.createElement("img"); img.className = "av"; img.src = url; img.alt = ""; img.loading = "lazy"; img.setAttribute("data-av", ""); av.replaceWith(img); }
+    });
+    $("wall1").querySelectorAll("[data-twitch]").forEach(function (a) { a.classList.toggle("is-live", !!live.twitch[a.dataset.twitch]); });
+  }
 
-    async function render(){
-      const all=TWITCH_CHANNELS.map(c=>c.login.toLowerCase());
-      try{
-        const [streams,users]=await Promise.all([fetchStreams(all),fetchUsers(all)]);
-        const liveMap=new Map(streams.map(s=>[(s.user_login||s.user_name).toLowerCase(),s]));
-        const userMap=new Map(users.map(u=>[u.login.toLowerCase(),u]));
+  function applyResult(j) {
+    live.twitch = {}; live.tiktok = {};
+    (j.twitch || []).forEach(function (s) { if (s && s.login) live.twitch[String(s.login).toLowerCase()] = s; });
+    (j.tiktok || []).forEach(function (h) { if (h) live.tiktok[String(h).toLowerCase()] = true; });
+    if (j.avatars) Object.keys(j.avatars).forEach(function (k) { live.avatars[k.toLowerCase()] = j.avatars[k]; });
+    live.ok = true; live.at = new Date();
+    renderBoard();
+  }
 
-        liveGrid.innerHTML='';
-        rosterTwitch.innerHTML='';
+  function poll() {
+    if (!C.liveEndpoint || !loginList.length) return;
+    var url = C.liveEndpoint.replace(/\/$/, "") + "/?logins=" + encodeURIComponent(loginList.join(","));
+    fetch(url, { cache: "no-store" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(applyResult).catch(function () { /* Anzeige bleibt beim letzten Stand */ });
+  }
 
-        // Live
-        const live=[];
-        for(const c of TWITCH_CHANNELS){
-          const s=liveMap.get(c.login.toLowerCase());
-          if(s){
-            const u=userMap.get(c.login.toLowerCase());
-            s.display_name=u?.display_name||c.name;
-            s.profile_image_url=u?.profile_image_url;
-            s.login=c.login; // fix undefined URL
-            live.push(s);
-          }
-        }
-        if(live.length===0){liveEmpty.style.display='block';}
-        else{liveEmpty.style.display='none';live.forEach(s=>liveGrid.appendChild(channelCard(s,true)));}
-
-        // Teilnehmer Twitch
-        for(const c of TWITCH_CHANNELS){
-          const u=userMap.get(c.login.toLowerCase())||{login:c.login,display_name:c.name,profile_image_url:null};
-          const card=document.createElement('article');card.className='card';
-          const body=document.createElement('div');body.className='body';
-          const row=document.createElement('div');row.className='rowline';
-          if(u.profile_image_url){const av=document.createElement('img');av.className='avatar';av.src=u.profile_image_url;row.appendChild(av);}
-          const h=document.createElement('h3');h.className='title';h.textContent=u.display_name;row.appendChild(h);body.appendChild(row);
-          const actions=document.createElement('div');actions.className='actions';
-          const a=document.createElement('a');a.className='btn';a.href=`https://twitch.tv/${u.login}`;a.target='_blank';a.textContent='Profil öffnen';actions.appendChild(a);body.appendChild(actions);
-          card.appendChild(body);rosterTwitch.appendChild(card);
-        }
-
-        // Teilnehmer Andere
-        rosterOther.innerHTML='';
-        OTHER_LINKS.forEach(it=>{
-          const card=document.createElement('article');card.className='card';
-          const body=document.createElement('div');body.className='body';
-          const h=document.createElement('h3');h.className='title';h.textContent=it.name;body.appendChild(h);
-          const actions=document.createElement('div');actions.className='actions';
-          const a=document.createElement('a');a.className='btn';a.href=it.url;a.target='_blank';a.textContent='Profil öffnen';actions.appendChild(a);body.appendChild(actions);
-          card.appendChild(body);rosterOther.appendChild(card);
-        });
-
-        lastUpdated.textContent='Aktualisiert: '+fmtTime(new Date());
-        hideBanner();
-      }catch(e){
-        console.error(e);showBanner('Fehler beim Laden: '+e.message,'error');
-      }
-    }
-
-    document.getElementById('refresh').addEventListener('click',render);
-    setInterval(render,60000);
-    render();
-  </script>
+  if (DEMO) {
+    $("demoBanner").hidden = false;
+    var demoLogins = loginList.slice(0, 3);
+    applyResult({ twitch: demoLogins.map(function (l, i) { return { login: l, title: ["Tag 1 auf SwissCraft: Base bauen!", "Enderdrache heute Abend?", "Chill Mining mit Chat"][i], viewers: [412, 96, 37][i], game: "Minecraft" }; }), tiktok: [] });
+  } else {
+    renderBoard();
+    poll();
+    setInterval(poll, Math.max(20, C.pollSeconds || 60) * 1000);
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) poll(); });
+  }
+  if (!started) tickCountdown();
+})();
+</script>
 </body>
 </html>
