@@ -11,6 +11,7 @@
 window.SWISSCRAFT_DATA = {
   people: {
     basefoxi:             { name: "BaseFoxi",             twitch: "basefoxi" },
+    clia_rose:            { name: "Clia_Rose",            twitch: "clia_rose" },
     daedalcraft:          { name: "DaedalCraft",          twitch: "daedalcraft" },
     ddydavee:             { name: "DDY.Davee",            twitch: "davidsldt" },
     docflashy:            { name: "DocFlashy",            twitch: "docflashy" },
@@ -23,7 +24,6 @@ window.SWISSCRAFT_DATA = {
     karagorni:            { name: "Karagorni",            twitch: "karagorni" },
     kritiker8153:         { name: "kritiker8153",         twitch: "kritiker8153" },
     laisalicious:         { name: "Laisalicious",         twitch: "laisalicious" },
-    lenidla:              { name: "Lenidla",              twitch: "lenidla" },
     leonie_zh:            { name: "Leonie_zh",            twitch: "leonie_zh" },
     logik66:              { name: "Logik66",              twitch: "logik_66" },
     madriztv:             { name: "MadrizTV",             twitch: "madriztv" },
@@ -55,9 +55,9 @@ window.SWISSCRAFT_DATA = {
 
   // Season 2 – Reihenfolge wie auf dem offiziellen Lineup-Poster
   season2: [
-    "basefoxi", "daedalcraft", "ddydavee", "docflashy", "dreamyrere",
+    "basefoxi", "clia_rose", "daedalcraft", "ddydavee", "docflashy", "dreamyrere",
     "elijahtetillaa", "gery_live", "helagon", "jakofski37", "jenniferjordii",
-    "karagorni", "kritiker8153", "laisalicious", "lenidla", "leonie_zh", "logik66",
+    "karagorni", "kritiker8153", "laisalicious", "leonie_zh", "logik66",
     "madriztv", "maeloromani", "magopi", "makroniklp", "marachuuu",
     "mlgamer", "missesseli", "monkeey99", "nanox", "naxlani",
     "nimmbaa", "onklskoko", "prinznorin", "saendu2k", "samuel_zgg",
